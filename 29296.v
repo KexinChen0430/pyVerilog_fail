@@ -1,0 +1,219 @@
+module
+   wire           speedis100;            // Asserted when speed is 100Mb/s.
+   wire           speedis10100;          // Asserted when speed is 10Mb/s or 100Mb/s.
+   (* KEEP = "TRUE" *)
+   wire           rx_mac_aclk_int;       // Internal receive gmii/mii clock signal.
+   (* KEEP = "TRUE" *)
+   wire           tx_mac_aclk_int;       // Internal transmit gmii/mii clock signal.
+   wire           glbl_rst;
+   wire           tx_reset_int;         // Synchronous reset in the MAC and gmii Tx domain
+   wire           rx_reset_int;         // Synchronous reset in the MAC and gmii Rx domain
+   wire  [27:0]   rx_statistics_vector_int;
+   wire           rx_statistics_valid_int;
+   wire  [31:0]   tx_statistics_vector_int;
+   wire           tx_statistics_valid_int;
+   wire           bus2ip_clk;
+   wire           bus2ip_reset;
+   wire  [31:0]   bus2ip_addr;
+   wire           bus2ip_cs;
+   wire           bus2ip_rdce;
+   wire           bus2ip_wrce;
+   wire  [31:0]   bus2ip_data;
+   wire  [31:0]   ip2bus_data;
+   wire           ip2bus_wrack;
+   wire           ip2bus_rdack;
+   wire           ip2bus_error;
+   // assign outputs
+   assign rx_reset = rx_reset_int;
+   assign tx_reset = tx_reset_int;
+   // Assign the internal clock signals to output ports.
+   assign rx_mac_aclk = rx_mac_aclk_int;
+   assign glbl_rst = !glbl_rstn;
+   // An IDELAYCTRL primitive needs to be instantiated for the Fixed Tap Delay
+   // mode of the IDELAY.
+   // All IDELAYs in Fixed Tap Delay mode and the IDELAYCTRL primitives have
+   // to be LOC'ed in the UCF file.
+   IDELAYCTRL dlyctrl (
+      .RDY              (),
+      .REFCLK           (refclk),
+      .RST              (idelayctrl_reset)
+   );
+   // Create a synchronous reset in the IDELAYCTRL refclk clock domain.
+   reset_sync idelayctrl_reset_gen (
+      .clk              (refclk),
+      .enable           (1'b1),
+      .reset_in         (glbl_rst),
+      .reset_out        (idelayctrl_reset_sync)
+   );
+   // Reset circuitry for the IDELAYCTRL reset.
+   // The IDELAYCTRL must experience a pulse which is at least 50 ns in
+   // duration.  This is ten clock cycles of the 200MHz refclk.  Here we
+   // drive the reset pulse for 12 clock cycles.
+   always @(posedge refclk)
+   begin
+      if (idelayctrl_reset_sync) begin
+         idelay_reset_cnt     <= 4'b0000;
+         idelayctrl_reset     <= 1'b1;
+      end
+      else begin
+         case (idelay_reset_cnt)
+            4'b0000 : idelay_reset_cnt <= 4'b0001;
+            4'b0001 : idelay_reset_cnt <= 4'b0010;
+            4'b0010 : idelay_reset_cnt <= 4'b0011;
+            4'b0011 : idelay_reset_cnt <= 4'b0100;
+            4'b0100 : idelay_reset_cnt <= 4'b0101;
+            4'b0101 : idelay_reset_cnt <= 4'b0110;
+            4'b0110 : idelay_reset_cnt <= 4'b0111;
+            4'b0111 : idelay_reset_cnt <= 4'b1000;
+            4'b1000 : idelay_reset_cnt <= 4'b1001;
+            4'b1001 : idelay_reset_cnt <= 4'b1010;
+            4'b1010 : idelay_reset_cnt <= 4'b1011;
+            4'b1011 : idelay_reset_cnt <= 4'b1100;
+            default : idelay_reset_cnt <= 4'b1100;
+         endcase
+         if (idelay_reset_cnt === 4'b1100) begin
+            idelayctrl_reset  <= 1'b0;
+         end
+         else begin
+            idelayctrl_reset  <= 1'b1;
+         end
+      end
+   end
+   assign tx_mac_aclk_int = gtx_clk;
+   // Instantiate GMII Interface
+   // Instantiate the GMII physical interface logic
+   gmii_if gmii_interface(
+      // Synchronous resets
+      .tx_reset         (tx_reset_int),
+      .rx_reset         (rx_reset_int),
+      // The following ports are the GMII physical interface: these will be at
+      // pins on the FPGA
+      .gmii_txd         (gmii_txd),
+      .gmii_tx_en       (gmii_tx_en),
+      .gmii_tx_er       (gmii_tx_er),
+      .gmii_tx_clk      (gmii_tx_clk),
+      .gmii_col         (gmii_col),
+      .gmii_crs         (gmii_crs),
+      .gmii_rxd         (gmii_rxd),
+      .gmii_rx_dv       (gmii_rx_dv),
+      .gmii_rx_er       (gmii_rx_er),
+      .gmii_rx_clk      (gmii_rx_clk),
+      // The following ports are the internal GMII connections from IOB logic
+      // to the TEMAC core
+      .txd_from_mac     (gmii_txd_int),
+      .tx_en_from_mac   (gmii_tx_en_int),
+      .tx_er_from_mac   (gmii_tx_er_int),
+      .tx_clk           (tx_mac_aclk_int),
+      .col_to_mac       (gmii_col_int),
+      .crs_to_mac       (gmii_crs_int),
+      .rxd_to_mac       (gmii_rxd_int),
+      .rx_dv_to_mac     (gmii_rx_dv_int),
+      .rx_er_to_mac     (gmii_rx_er_int),
+      // Receiver clock for the MAC and Client Logic
+      .rx_clk           (rx_mac_aclk_int)
+   );
+   // Instantiate the axi_ipif block
+   axi4_lite_ipif_wrapper #(
+      .C_BASE_ADDRESS      (C_BASE_ADDRESS)
+    ) axi4_lite_ipif (
+      // System signals
+      .s_axi_aclk          (s_axi_aclk),
+      .s_axi_aresetn       (s_axi_resetn),
+      .s_axi_awaddr        (s_axi_awaddr),
+      .s_axi_awvalid       (s_axi_awvalid),
+      .s_axi_awready       (s_axi_awready),
+      .s_axi_wdata         (s_axi_wdata),
+      .s_axi_wvalid        (s_axi_wvalid),
+      .s_axi_wready        (s_axi_wready),
+      .s_axi_bresp         (s_axi_bresp),
+      .s_axi_bvalid        (s_axi_bvalid),
+      .s_axi_bready        (s_axi_bready),
+      .s_axi_araddr        (s_axi_araddr),
+      .s_axi_arvalid       (s_axi_arvalid),
+      .s_axi_arready       (s_axi_arready),
+      .s_axi_rdata         (s_axi_rdata),
+      .s_axi_rresp         (s_axi_rresp),
+      .s_axi_rvalid        (s_axi_rvalid),
+      .s_axi_rready        (s_axi_rready),
+      // controls to the ipif
+      .bus2ip_clk          (bus2ip_clk),
+      .bus2ip_reset        (bus2ip_reset),
+      .bus2ip_addr         (bus2ip_addr),
+      .bus2ip_cs           (bus2ip_cs),
+      .bus2ip_rdce         (bus2ip_rdce),
+      .bus2ip_wrce         (bus2ip_wrce),
+      .bus2ip_data         (bus2ip_data),
+      .ip2bus_data         (ip2bus_data),
+      .ip2bus_wrack        (ip2bus_wrack),
+      .ip2bus_rdack        (ip2bus_rdack),
+      .ip2bus_error        (ip2bus_error)
+   );
+   assign rx_statistics_vector = rx_statistics_vector_int;
+   assign rx_statistics_valid  = rx_statistics_valid_int;
+   assign tx_statistics_vector = tx_statistics_vector_int;
+   assign tx_statistics_valid  = tx_statistics_valid_int;
+   // Instantiate the TEMAC core
+   tri_mode_eth_mac_v5_2 trimac_core(
+      // asynchronous reset
+      .glbl_rstn              (glbl_rstn),
+      .rx_axi_rstn            (rx_axi_rstn),
+      .tx_axi_rstn            (tx_axi_rstn),
+      // Receiver Interface
+      .rx_axi_clk             (rx_mac_aclk_int),
+      .rx_reset_out           (rx_reset_int),
+      .rx_axis_mac_tdata      (rx_axis_mac_tdata),
+      .rx_axis_mac_tvalid     (rx_axis_mac_tvalid),
+      .rx_axis_mac_tlast      (rx_axis_mac_tlast),
+      .rx_axis_mac_tuser      (rx_axis_mac_tuser),
+      // Receiver Statistics
+      .rx_statistics_vector   (rx_statistics_vector_int),
+      .rx_statistics_valid    (rx_statistics_valid_int),
+      // Transmitter Interface
+      .tx_axi_clk             (tx_mac_aclk_int),
+      .tx_reset_out           (tx_reset_int),
+      .tx_axis_mac_tdata      (tx_axis_mac_tdata),
+      .tx_axis_mac_tvalid     (tx_axis_mac_tvalid),
+      .tx_axis_mac_tlast      (tx_axis_mac_tlast),
+      .tx_axis_mac_tuser      (tx_axis_mac_tuser),
+      .tx_axis_mac_tready     (tx_axis_mac_tready),
+      .tx_collision           (tx_collision),
+      .tx_retransmit          (tx_retransmit),
+      .tx_ifg_delay           (tx_ifg_delay),
+      // Transmitter Statistics
+      .tx_statistics_vector   (tx_statistics_vector_int),
+      .tx_statistics_valid    (tx_statistics_valid_int),
+      // MAC Control Interface
+      .pause_req              (pause_req),
+      .pause_val              (pause_val),
+      // Current Speed Indication
+      .speed_is_100           (speedis100),
+      .speed_is_10_100        (speedis10100),
+      // Physical Interface of the core
+      .gmii_txd               (gmii_txd_int),
+      .gmii_tx_en             (gmii_tx_en_int),
+      .gmii_tx_er             (gmii_tx_er_int),
+      .gmii_crs               (gmii_crs_int),
+      .gmii_col               (gmii_col_int),
+      .gmii_rxd               (gmii_rxd_int),
+      .gmii_rx_dv             (gmii_rx_dv_int),
+      .gmii_rx_er             (gmii_rx_er_int),
+      // MDIO Interface
+      .mdc_out                (mdc),
+      .mdio_in                (mdio_i),
+      .mdio_out               (mdio_o),
+      .mdio_tri               (mdio_t),
+      // IPIC Interface
+      .bus2ip_clk             (bus2ip_clk),
+      .bus2ip_reset           (bus2ip_reset),
+      .bus2ip_addr            (bus2ip_addr),
+      .bus2ip_cs              (bus2ip_cs),
+      .bus2ip_rdce            (bus2ip_rdce),
+      .bus2ip_wrce            (bus2ip_wrce),
+      .bus2ip_data            (bus2ip_data),
+      .ip2bus_data            (ip2bus_data),
+      .ip2bus_wrack           (ip2bus_wrack),
+      .ip2bus_rdack           (ip2bus_rdack),
+      .ip2bus_error           (ip2bus_error),
+      .mac_irq                ()
+   );
+endmodule

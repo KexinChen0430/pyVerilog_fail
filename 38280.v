@@ -1,0 +1,110 @@
+module tb_sha256_w_mem();
+  // Internal constant and parameter definitions.
+  parameter DEBUG          = 1;
+  parameter DISPLAY_CYCLES = 0;
+  parameter CLK_HALF_PERIOD = 2;
+  // Wires.
+  reg            tb_clk;
+  reg            tb_reset_n;
+  reg           tb_init;
+  reg           tb_next;
+  reg [511 : 0] tb_block;
+  wire [31 : 0] tb_w;
+  reg [63 : 0] cycle_ctr;
+  reg [31 : 0] error_ctr;
+  reg [31 : 0] tc_ctr;
+  // Device Under Test.
+  sha256_w_mem dut(
+                   .clk(tb_clk),
+                   .reset_n(tb_reset_n),
+                   .block(tb_block),
+                   .init(tb_init),
+                   .next(tb_next),
+                   .w(tb_w)
+                  );
+  // clk_gen
+  // Clock generator process.
+  always
+    begin : clk_gen
+      #CLK_HALF_PERIOD tb_clk = !tb_clk;
+    end // clk_gen
+  // dut_monitor
+  // Monitor displaying information every cycle.
+  // Includes the cycle counter.
+  always @ (posedge tb_clk)
+    begin : dut_monitor
+      cycle_ctr = cycle_ctr + 1;
+      if (DISPLAY_CYCLES)
+        begin
+          $display("cycle = %016x:", cycle_ctr);
+        end
+      if (DEBUG)
+        begin
+          $display("dut w_ctr      = %02x:", dut.w_ctr_reg);
+          $display("dut w_tmp      = %02x:", dut.w_tmp);
+          dump_w_state();
+        end
+    end // dut_monitor
+  // dump_w_state()
+  // Dump the current state of all W registers.
+  task dump_w_state;
+    begin
+      $display("W state:");
+      $display("w0_reg  = %08x, w1_reg  = %08x, w2_reg  = %08x, w3_reg  = %08x",
+               dut.w_mem[00], dut.w_mem[01], dut.w_mem[02], dut.w_mem[03]);
+      $display("w4_reg  = %08x, w5_reg  = %08x, w6_reg  = %08x, w7_reg  = %08x",
+               dut.w_mem[04], dut.w_mem[05], dut.w_mem[06], dut.w_mem[07]);
+      $display("w8_reg  = %08x, w9_reg  = %08x, w10_reg = %08x, w11_reg = %08x",
+               dut.w_mem[08], dut.w_mem[09], dut.w_mem[10], dut.w_mem[11]);
+      $display("w12_reg = %08x, w13_reg = %08x, w14_reg = %08x, w15_reg = %08x",
+               dut.w_mem[12], dut.w_mem[13], dut.w_mem[14], dut.w_mem[15]);
+      $display("w_new = %08x", dut.w_new);
+      $display("");
+    end
+  endtask // dump_state
+  // reset_dut
+  task reset_dut;
+    begin
+      $display("*** Toggle reset.");
+      tb_reset_n = 0;
+      #(4 * CLK_HALF_PERIOD);
+      tb_reset_n = 1;
+    end
+  endtask // reset_dut
+  // init_sim
+  task init_sim;
+    begin
+      $display("*** Simulation init.");
+      tb_clk = 0;
+      tb_reset_n = 1;
+      cycle_ctr = 0;
+      tb_init = 0;
+      tb_block = 512'h0;
+    end
+  endtask // reset_dut
+  // test_w_schedule()
+  // Test that W scheduling happens and work correctly.
+  // Note: Currently not a self checking test case.
+  task test_w_schedule;
+    begin
+      $display("*** Test of W schedule processing. --");
+      tb_block = 512'h61626380000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000018;
+      tb_init = 1;
+      #(4 * CLK_HALF_PERIOD);
+      tb_init = 0;
+      dump_w_state();
+      tb_next = 1;
+      #(150 * CLK_HALF_PERIOD);
+    end
+  endtask // test_w_schedule
+  // The main test functionality.
+  initial
+    begin : w_mem_test
+      $display("   -- Testbench for sha256 w memory started --");
+      init_sim();
+      reset_dut();
+      test_w_schedule();
+      $display("*** Simulation done.");
+      $finish;
+    end
+endmodule

@@ -1,0 +1,27 @@
+module above.
+  cf_adc_wr #(.C_CF_BUFTYPE(C_CF_BUFTYPE)) i_adc_wr (
+    .adc_clk_in_p (adc_clk_in_p),
+    .adc_clk_in_n (adc_clk_in_n),
+    .adc_data_in_p (adc_data_in_p),
+    .adc_data_in_n (adc_data_in_n),
+    .adc_data_or_p (adc_data_or_p),
+    .adc_data_or_n (adc_data_or_n),
+    .adc_clk (adc_clk),
+    .adc_valid (adc_valid_s),
+    .adc_data (adc_data_s),
+    .adc_or (adc_or_s),
+    .adc_pn_oos (adc_pn_oos_s),
+    .adc_pn_err (adc_pn_err_s),
+    .up_pn_type (up_pn_type),
+    .up_dmode (up_dmode),
+    .up_delay_sel (up_delay_sel),
+    .up_delay_rwn (up_delay_rwn),
+    .up_delay_addr (up_delay_addr),
+    .up_delay_wdata (up_delay_wdata),
+    .delay_clk (delay_clk),
+    .delay_ack (delay_ack_s),
+    .delay_rdata (delay_rdata_s),
+    .delay_locked (delay_locked_s),
+    .adc_mon_valid (adc_mon_valid),
+    .adc_mon_data (adc_mon_data));
+endmodule

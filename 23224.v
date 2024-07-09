@@ -1,0 +1,31 @@
+module...
+mkWCI2A4LM bridge(
+  .wciS0_Clk                 (bridge_Clk),
+  .wciS0_MReset_n            (bridge_Reset_n),
+  .wciS0_MCmd                (wciS0_MCmd),
+  .wciS0_MAddrSpace          (wciS0_AddrSpace),
+  .wciS0_MByteEn             (wciS0_MByteEn),
+  .wciS0_MAddr               (wciS0_MAddr),
+  .wciS0_MData               (wciS0_MData),
+  .wciS0_SResp               (wciS0_SResp),
+  .wciS0_SData               (wciS0_SData),
+  .wciS0_SThreadBusy         (wciS0_SThreadBusy),
+  .wciS0_SFlag               (wciS0_SFlag),
+  .wciS0_MFlag               (wciS0_MFlag),
+  .axiM0_wrAddr_data         (axiM0_wrAddr_data),
+  .axiM0_wrAddr_valid        (axiM0_AWVALID),
+  .axiM0_wrAddr_ready_value  (axiM0_AWREADY),
+  .axiM0_wrData_data         (axiM0_wrData_data),
+  .axiM0_wrData_valid        (axiM0_WVALID),
+  .axiM0_wrData_ready_value  (axiM0_WREADY),
+  .axiM0_wrResp_data_value   (axiM0_wrResp_data_value),
+  .axiM0_wrResp_valid_value  (axiM0_BVALID),
+  .axiM0_wrResp_ready        (axiM0_BREADY),
+  .axiM0_rdAddr_data         (axiM0_rdAddr_data),
+  .axiM0_rdAddr_valid        (axiM0_ARVALID),
+  .axiM0_rdAddr_ready_value  (axiM0_ARREADY),
+  .axiM0_rdResp_data_value   (axiM0_rdResp_data_value),
+  .axiM0_rdResp_valid_value  (axiM0_RVALID),
+  .axiM0_rdResp_ready        (axiM0_RREADY)
+);
+endmodule

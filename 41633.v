@@ -1,0 +1,101 @@
+module outputs)
+   // End of automatics
+   input    scan_in;
+   output   scan_out;
+       /*
+   cpx_dp0 AUTO_TEMPLATE(
+			  .scan_out	(),
+			  .scan_in	());
+*/
+   cpx_dp0 cpx_dp0(/*AUTOINST*/
+		   // Outputs
+		   .scan_out		(),			 // Templated
+		   .cpx_spc0_data_cx_l	(cpx_spc0_data_cx_l[`CPX_WIDTH-1:0]),
+		   // Inputs
+		   .arbcp0_cpxdp_grant_ca(arbcp0_cpxdp_grant_ca[5:0]),
+		   .arbcp0_cpxdp_q0_hold_ca(arbcp0_cpxdp_q0_hold_ca[5:0]),
+		   .arbcp0_cpxdp_qsel0_ca(arbcp0_cpxdp_qsel0_ca[5:0]),
+		   .arbcp0_cpxdp_qsel1_ca(arbcp0_cpxdp_qsel1_ca[5:0]),
+		   .arbcp0_cpxdp_shift_cx(arbcp0_cpxdp_shift_cx[5:0]),
+		   .rclk		(rclk),
+		   .scan_in		(),			 // Templated
+		   .shiftenable		(shiftenable),
+		   .scache0_cpx_data_ca	(scache0_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache1_cpx_data_ca	(scache1_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache2_cpx_data_ca	(scache2_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache3_cpx_data_ca	(scache3_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .io_cpx_data_ca	(io_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .fp_cpx_data_ca	(fp_cpx_data_ca[`CPX_WIDTH-1:0]));
+       /*
+   cpx_dp2 AUTO_TEMPLATE(
+			  .scan_out	(),
+			  .scan_in	());
+*/
+   cpx_dp2 cpx_dp2(/*AUTOINST*/
+		   // Outputs
+		   .scan_out		(),			 // Templated
+		   .cpx_spc2_data_cx_l	(cpx_spc2_data_cx_l[`CPX_WIDTH-1:0]),
+		   // Inputs
+		   .arbcp2_cpxdp_grant_ca(arbcp2_cpxdp_grant_ca[5:0]),
+		   .arbcp2_cpxdp_q0_hold_ca(arbcp2_cpxdp_q0_hold_ca[5:0]),
+		   .arbcp2_cpxdp_qsel0_ca(arbcp2_cpxdp_qsel0_ca[5:0]),
+		   .arbcp2_cpxdp_qsel1_ca(arbcp2_cpxdp_qsel1_ca[5:0]),
+		   .arbcp2_cpxdp_shift_cx(arbcp2_cpxdp_shift_cx[5:0]),
+		   .rclk		(rclk),
+		   .scan_in		(),			 // Templated
+		   .shiftenable		(shiftenable),
+		   .scache0_cpx_data_ca	(scache0_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache1_cpx_data_ca	(scache1_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache2_cpx_data_ca	(scache2_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache3_cpx_data_ca	(scache3_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .io_cpx_data_ca	(io_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .fp_cpx_data_ca	(fp_cpx_data_ca[`CPX_WIDTH-1:0]));
+       /*
+   cpx_dp4 AUTO_TEMPLATE(
+			  .scan_out	(),
+			  .scan_in	());
+*/
+   cpx_dp4 cpx_dp4(/*AUTOINST*/
+		   // Outputs
+		   .scan_out		(),			 // Templated
+		   .cpx_spc4_data_cx_l	(cpx_spc4_data_cx_l[`CPX_WIDTH-1:0]),
+		   // Inputs
+		   .arbcp4_cpxdp_grant_ca(arbcp4_cpxdp_grant_ca[5:0]),
+		   .arbcp4_cpxdp_q0_hold_ca(arbcp4_cpxdp_q0_hold_ca[5:0]),
+		   .arbcp4_cpxdp_qsel0_ca(arbcp4_cpxdp_qsel0_ca[5:0]),
+		   .arbcp4_cpxdp_qsel1_ca(arbcp4_cpxdp_qsel1_ca[5:0]),
+		   .arbcp4_cpxdp_shift_cx(arbcp4_cpxdp_shift_cx[5:0]),
+		   .rclk		(rclk),
+		   .scan_in		(),			 // Templated
+		   .shiftenable		(shiftenable),
+		   .scache0_cpx_data_ca	(scache0_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache1_cpx_data_ca	(scache1_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache2_cpx_data_ca	(scache2_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache3_cpx_data_ca	(scache3_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .io_cpx_data_ca	(io_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .fp_cpx_data_ca	(fp_cpx_data_ca[`CPX_WIDTH-1:0]));
+       /*
+   cpx_dp6 AUTO_TEMPLATE(
+			  .scan_out	(),
+			  .scan_in	());
+*/
+   cpx_dp6 cpx_dp6(/*AUTOINST*/
+		   // Outputs
+		   .scan_out		(),			 // Templated
+		   .cpx_spc6_data_cx_l	(cpx_spc6_data_cx_l[`CPX_WIDTH-1:0]),
+		   // Inputs
+		   .arbcp6_cpxdp_grant_ca(arbcp6_cpxdp_grant_ca[5:0]),
+		   .arbcp6_cpxdp_q0_hold_ca(arbcp6_cpxdp_q0_hold_ca[5:0]),
+		   .arbcp6_cpxdp_qsel0_ca(arbcp6_cpxdp_qsel0_ca[5:0]),
+		   .arbcp6_cpxdp_qsel1_ca(arbcp6_cpxdp_qsel1_ca[5:0]),
+		   .arbcp6_cpxdp_shift_cx(arbcp6_cpxdp_shift_cx[5:0]),
+		   .rclk		(rclk),
+		   .scan_in		(),			 // Templated
+		   .shiftenable		(shiftenable),
+		   .scache0_cpx_data_ca	(scache0_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache1_cpx_data_ca	(scache1_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache2_cpx_data_ca	(scache2_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .scache3_cpx_data_ca	(scache3_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .io_cpx_data_ca	(io_cpx_data_ca[`CPX_WIDTH-1:0]),
+		   .fp_cpx_data_ca	(fp_cpx_data_ca[`CPX_WIDTH-1:0]));
+endmodule

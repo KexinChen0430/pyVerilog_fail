@@ -1,0 +1,100 @@
+module \$__XILINX_RAMB18_TDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN);
+	parameter CFG_ABITS = 10;
+	parameter CFG_DBITS = 18;
+	parameter CFG_ENABLE_B = 2;
+	parameter CLKPOL2 = 1;
+	parameter CLKPOL3 = 1;
+	parameter [18431:0] INIT = 18432'bx;
+	input CLK2;
+	input CLK3;
+	input [CFG_ABITS-1:0] A1ADDR;
+	output [CFG_DBITS-1:0] A1DATA;
+	input A1EN;
+	input [CFG_ABITS-1:0] B1ADDR;
+	input [CFG_DBITS-1:0] B1DATA;
+	input [CFG_ENABLE_B-1:0] B1EN;
+	wire [13:0] A1ADDR_14 = A1ADDR << (14 - CFG_ABITS);
+	wire [13:0] B1ADDR_14 = B1ADDR << (14 - CFG_ABITS);
+	wire [3:0] B1EN_4 = B1EN;
+	wire [1:0] DIP, DOP;
+	wire [15:0] DI, DO;
+	wire [15:0] DOBDO;
+	wire [1:0] DOPBDOP;
+	assign A1DATA = { DOP[1], DO[15: 8], DOP[0], DO[ 7: 0] };
+	assign { DIP[1], DI[15: 8], DIP[0], DI[ 7: 0] } = B1DATA;
+	generate if (CFG_DBITS > 8) begin
+		RAMB18E1 #(
+			.RAM_MODE("TDP"),
+			.READ_WIDTH_A(CFG_DBITS),
+			.READ_WIDTH_B(CFG_DBITS),
+			.WRITE_WIDTH_A(CFG_DBITS),
+			.WRITE_WIDTH_B(CFG_DBITS),
+			.WRITE_MODE_A("READ_FIRST"),
+			.WRITE_MODE_B("READ_FIRST"),
+			.IS_CLKARDCLK_INVERTED(!CLKPOL2),
+			.IS_CLKBWRCLK_INVERTED(!CLKPOL3),
+			`include "brams_init_18.vh"
+			.SIM_DEVICE("7SERIES")
+		) _TECHMAP_REPLACE_ (
+			.DIADI(16'b0),
+			.DIPADIP(2'b0),
+			.DOADO(DO),
+			.DOPADOP(DOP),
+			.ADDRARDADDR(A1ADDR_14),
+			.CLKARDCLK(CLK2),
+			.ENARDEN(A1EN),
+			.REGCEAREGCE(|1),
+			.RSTRAMARSTRAM(|0),
+			.RSTREGARSTREG(|0),
+			.WEA(2'b0),
+			.DIBDI(DI),
+			.DIPBDIP(DIP),
+			.DOBDO(DOBDO),
+			.DOPBDOP(DOPBDOP),
+			.ADDRBWRADDR(B1ADDR_14),
+			.CLKBWRCLK(CLK3),
+			.ENBWREN(|1),
+			.REGCEB(|0),
+			.RSTRAMB(|0),
+			.RSTREGB(|0),
+			.WEBWE(B1EN_4)
+		);
+	end else begin
+		RAMB18E1 #(
+			.RAM_MODE("TDP"),
+			.READ_WIDTH_A(CFG_DBITS),
+			.READ_WIDTH_B(CFG_DBITS),
+			.WRITE_WIDTH_A(CFG_DBITS),
+			.WRITE_WIDTH_B(CFG_DBITS),
+			.WRITE_MODE_A("READ_FIRST"),
+			.WRITE_MODE_B("READ_FIRST"),
+			.IS_CLKARDCLK_INVERTED(!CLKPOL2),
+			.IS_CLKBWRCLK_INVERTED(!CLKPOL3),
+			`include "brams_init_16.vh"
+			.SIM_DEVICE("7SERIES")
+		) _TECHMAP_REPLACE_ (
+			.DIADI(16'b0),
+			.DIPADIP(2'b0),
+			.DOADO(DO),
+			.DOPADOP(DOP),
+			.ADDRARDADDR(A1ADDR_14),
+			.CLKARDCLK(CLK2),
+			.ENARDEN(A1EN),
+			.REGCEAREGCE(|1),
+			.RSTRAMARSTRAM(|0),
+			.RSTREGARSTREG(|0),
+			.WEA(2'b0),
+			.DIBDI(DI),
+			.DIPBDIP(DIP),
+			.DOBDO(DOBDO),
+			.DOPBDOP(DOPBDOP),
+			.ADDRBWRADDR(B1ADDR_14),
+			.CLKBWRCLK(CLK3),
+			.ENBWREN(|1),
+			.REGCEB(|0),
+			.RSTRAMB(|0),
+			.RSTREGB(|0),
+			.WEBWE(B1EN_4)
+		);
+	end endgenerate
+endmodule

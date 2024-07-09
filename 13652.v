@@ -1,0 +1,46 @@
+module bsg_mem_1r1w_sync_mask_write_bit #(parameter `BSG_INV_PARAM(width_p)
+                                        , parameter `BSG_INV_PARAM(els_p)
+                                        , parameter read_write_same_addr_p=0
+                                        , parameter addr_width_lp=`BSG_SAFE_CLOG2(els_p)
+                                        , parameter harden_p=1
+                                        )
+  ( input                      clk_i
+  , input                      reset_i
+  , input                      w_v_i
+  , input [width_p-1:0]        w_mask_i
+  , input [addr_width_lp-1:0]  w_addr_i
+  , input [width_p-1:0]        w_data_i
+  // currently unused
+  , input                      r_v_i
+  , input [addr_width_lp-1:0]  r_addr_i
+  , output logic [width_p-1:0] r_data_o
+  );
+  `bsg_mem_1r1w_sync_mask_write_bit_macro(64,88,6) else
+  `bsg_mem_1r1w_sync_mask_write_bit_macro(256,128,8) else
+     bsg_mem_1r1w_sync_mask_write_bit_synth
+       #(.width_p(width_p)
+         ,.els_p (els_p  )
+         ,.read_write_same_addr_p(read_write_same_addr_p)
+         ,.harden_p(harden_p)
+         ) synth
+         (.*);
+   //synopsys translate_off
+   always_ff @(posedge clk_i)
+     if (w_v_i)
+       begin
+          assert (w_addr_i < els_p)
+            else $error("Invalid address %x to %m of size %x\n", w_addr_i, els_p);
+          assert (~(r_addr_i == w_addr_i && w_v_i && r_v_i && !read_write_same_addr_p))
+            else
+              begin
+                 //$error("%m: Attempt to read and write same address (reset_i %b, %x <= %x (mask %x) old_val %x",reset_i, w_addr_i,w_data_i,w_mask_i,mem[r_addr_i]);
+                 $error("%m: Attempt to read and write same address (reset_i %b, %x <= %x (mask %x)",reset_i, w_addr_i,w_data_i,w_mask_i);
+                 //$finish();
+              end
+       end
+   initial
+     begin
+        $display("## %L: instantiating width_p=%d, els_p=%d, read_write_same_addr_p=%d harden_p=%d (%m)",width_p,els_p,read_write_same_addr_p, harden_p);
+     end
+   //synopsys translate_on
+endmodule

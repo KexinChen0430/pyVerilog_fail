@@ -1,0 +1,68 @@
+module CharLCD_v2_0_0 ;
+	wire [6:0] tmpOE__LCDPort_net;
+	wire [6:0] tmpFB_6__LCDPort_net;
+	wire [6:0] tmpIO_6__LCDPort_net;
+	wire [0:0] tmpINTERRUPT_0__LCDPort_net;
+	electrical [0:0] tmpSIOVREF__LCDPort_net;
+	cy_psoc3_pins_v1_10
+		#(.id("5d7669ae-5f32-40b5-9c5a-1eda1fc21044/ed092b9b-d398-4703-be89-cebf998501f6"),
+		  .drive_mode(21'b110_110_110_110_110_110_110),
+		  .ibuf_enabled(7'b1_1_1_1_1_1_1),
+		  .init_dr_st(7'b0_0_0_0_0_0_0),
+		  .input_clk_en(0),
+		  .input_sync(7'b1_1_1_1_1_1_1),
+		  .input_sync_mode(7'b0_0_0_0_0_0_0),
+		  .intr_mode(14'b00_00_00_00_00_00_00),
+		  .invert_in_clock(0),
+		  .invert_in_clock_en(0),
+		  .invert_in_reset(0),
+		  .invert_out_clock(0),
+		  .invert_out_clock_en(0),
+		  .invert_out_reset(0),
+		  .io_voltage(",,,,,,"),
+		  .layout_mode("CONTIGUOUS"),
+		  .oe_conn(7'b0_0_0_0_0_0_0),
+		  .oe_reset(0),
+		  .oe_sync(7'b0_0_0_0_0_0_0),
+		  .output_clk_en(0),
+		  .output_clock_mode(7'b0_0_0_0_0_0_0),
+		  .output_conn(7'b0_0_0_0_0_0_0),
+		  .output_mode(7'b0_0_0_0_0_0_0),
+		  .output_reset(0),
+		  .output_sync(7'b0_0_0_0_0_0_0),
+		  .pa_in_clock(-1),
+		  .pa_in_clock_en(-1),
+		  .pa_in_reset(-1),
+		  .pa_out_clock(-1),
+		  .pa_out_clock_en(-1),
+		  .pa_out_reset(-1),
+		  .pin_aliases(",,,,,,"),
+		  .pin_mode("OOOOOOO"),
+		  .por_state(4),
+		  .sio_group_cnt(0),
+		  .sio_hyst(7'b0_0_0_0_0_0_0),
+		  .sio_ibuf(""),
+		  .sio_info(14'b00_00_00_00_00_00_00),
+		  .sio_obuf(""),
+		  .sio_refsel(""),
+		  .sio_vtrip(""),
+		  .slew_rate(7'b0_0_0_0_0_0_0),
+		  .spanning(0),
+		  .use_annotation(7'b0_0_0_0_0_0_0),
+		  .vtrip(14'b10_10_10_10_10_10_10),
+		  .width(7))
+		LCDPort
+		 (.oe(tmpOE__LCDPort_net),
+		  .y({7'b0}),
+		  .fb({tmpFB_6__LCDPort_net[6:0]}),
+		  .io({tmpIO_6__LCDPort_net[6:0]}),
+		  .siovref(tmpSIOVREF__LCDPort_net),
+		  .interrupt({tmpINTERRUPT_0__LCDPort_net[0:0]}),
+		  .in_clock({1'b0}),
+		  .in_clock_en({1'b1}),
+		  .in_reset({1'b0}),
+		  .out_clock({1'b0}),
+		  .out_clock_en({1'b1}),
+		  .out_reset({1'b0}));
+	assign tmpOE__LCDPort_net = (`CYDEV_CHIP_MEMBER_USED == `CYDEV_CHIP_MEMBER_3A && `CYDEV_CHIP_REVISION_USED < `CYDEV_CHIP_REVISION_3A_ES3) ? ~{7'b1111111} : {7'b1111111};
+endmodule

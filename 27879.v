@@ -1,0 +1,52 @@
+module
+			out_class_key_wr<=1'b0;
+			out_class_valid_wr<=1'b0;
+			if(in_inputctrl_pkt_q[133:132]==2'b10)begin
+				out_inputctrl_pkt_rd<=1'b0;
+				out_offset_pkt_wr<=1'b1;
+				out_offset_pkt<=in_inputctrl_pkt_q;
+				out_offset_valid_wr<=1'b1;
+				out_offset_valid<=1'b1;
+				current_state<=idle_s;
+			end
+			else begin
+				out_inputctrl_pkt_rd<=1'b1;
+				out_offset_pkt_wr<=1'b1;
+				out_offset_pkt<=in_inputctrl_pkt_q;
+				current_state<=send_data_s;
+			end
+		end
+		discard_s:begin
+			out_inputctrl_valid_rd<=1'b0;
+			if(in_inputctrl_pkt_q[133:132]==2'b10)begin
+				out_inputctrl_pkt_rd<=1'b0;
+				current_state<=idle_s;
+			end
+			else begin
+				out_inputctrl_pkt_rd<=1'b1;
+				current_state<=discard_s;
+			end
+		end
+		default:;
+		endcase
+	end
+end
+fifo_64_1 FIFO_VALID_input_ctrl  (
+							.aclr(!reset),
+							.data(in_inputctrl_valid),
+							.clock(clk),
+							.rdreq(out_inputctrl_valid_rd),
+							.wrreq(in_inputctrl_valid_wr),
+							.q(in_inputctrl_valid_q),
+							.empty(in_inputctrl_valid_empty)
+						);
+fifo_256_134	FIFO_PKT_input_ctrl (
+								.aclr(!reset),
+								.data(in_inputctrl_pkt),
+								.clock(clk),
+								.rdreq(out_inputctrl_pkt_rd),
+								.wrreq(in_inputctrl_pkt_wr),
+								.q(in_inputctrl_pkt_q),
+								.usedw(out_inputctrl_pkt_usedw)
+								);
+endmodule
